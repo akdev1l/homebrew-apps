@@ -1,0 +1,31 @@
+---
+- name: "fetch latest release"
+  uri:
+    url: "{{ formula.release_api }}"
+    return_content: true
+  register: release
+
+- name: "set version"
+  set_fact:
+    current_version: "{{ release.json.tag_name | regex_replace('-', ',') }}"
+
+- name: "fetch arm64 sha256sum"
+  uri:
+    url: "{{ (release.json.assets | selectattr('name', 'search', 'macos-arm64.*\\.sha256sum$') | list | first).browser_download_url }}"
+    return_content: true
+  register: arm64_sha256_raw
+
+- name: "fetch intel sha256sum"
+  uri:
+    url: "{{ (release.json.assets | selectattr('name', 'search', 'macos-x86_64.*\\.sha256sum$') | list | first).browser_download_url }}"
+    return_content: true
+  register: intel_sha256_raw
+
+- name: "render template"
+  template:
+    src: "{{ formula.template_src }}"
+    dest: "{{ playbook_dir }}/{{ formula.template_src | regex_replace('\\.j2$', '') }}"
+  vars:
+    version: "{{ current_version }}"
+    arm64_sha256sum: "{{ arm64_sha256_raw.content | trim }}"
+    intel_sha256sum: "{{ intel_sha256_raw.content | trim }}"

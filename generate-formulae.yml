@@ -1,0 +1,13 @@
+---
+- name: generate formulae
+  hosts: localhost
+  vars:
+    formulae:
+      - release_api: "https://codeberg.org/api/v1/repos/librewolf/bsys6/releases/latest"
+        template_src: "Casks/l/librewolf.rb.j2"
+  tasks:
+    - name: process each formula
+      include_tasks: tasks/formula.yml
+      vars:
+        formula: "{{item}}"
+      loop: "{{ formulae }}"
