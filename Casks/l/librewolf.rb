@@ -1,7 +1,7 @@
 cask "librewolf" do
   arch arm: "arm64", intel: "x86_64"
 
-  version "148.0,1"
+  version "148.0,2"
   sha256 arm:   "bd26709405f5bae9df8b58f3c09bed96f8d68fcc21ed1b5ca55d8c75bca1879f",
          intel: "e5170f572699292b4be2a26258d71bd796ae586a9e28f148e70cd9cca1538f00"
 
