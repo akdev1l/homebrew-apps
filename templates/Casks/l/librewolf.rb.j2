@@ -35,35 +35,8 @@ cask "librewolf" do
   end
 
   postflight do
-    plist_path = "#{ENV["HOME"]}/Library/LaunchAgents/com.user.akdev1l.librewolf.quaratine.fix.plist"
-    File.write plist_path, <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>com.user.akdev1l.librewolf.quaratine.fix</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>/usr/bin/xattr</string>
-          <string>-dr</string>
-          <string>com.apple.quarantine</string>
-          <string>#{appdir}/LibreWolf.app</string>
-        </array>
-        <key>WatchPaths</key>
-        <array>
-          <string>#{appdir}/LibreWolf.app</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-      </dict>
-      </plist>
-    EOS
-    system_command "/bin/launchctl", args: ["load", plist_path]
+    system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{appdir}/LibreWolf.app"]
   end
-
-  uninstall launchctl: "com.user.akdev1l.librewolf.quaratine.fix",
-            delete:    "~/Library/LaunchAgents/com.user.akdev1l.librewolf.quaratine.fix.plist"
 
   zap trash: [
     "~/.librewolf",
