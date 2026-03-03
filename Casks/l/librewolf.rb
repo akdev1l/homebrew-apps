@@ -34,6 +34,7 @@ cask "librewolf" do
     EOS
   end
 
+  # Remove quarantine
   postflight do
     system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{appdir}/LibreWolf.app"]
   end
