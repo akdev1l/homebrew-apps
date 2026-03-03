@@ -27,15 +27,16 @@ cask "librewolf" do
   shimscript = "#{staged_path}/librewolf.wrapper.sh"
   binary shimscript, target: "librewolf"
 
-  launchagent "com.user.akdev1l.librewolf.quaratine.fix.plist"
-
   preflight do
     File.write shimscript, <<~EOS
       #!/bin/sh
       exec '#{appdir}/LibreWolf.app/Contents/MacOS/librewolf' "$@"
     EOS
+  end
 
-    File.write "#{staged_path}/com.user.akdev1l.librewolf.quaratine.fix.plist", <<~EOS
+  postflight do
+    plist_path = "#{ENV["HOME"]}/Library/LaunchAgents/com.user.akdev1l.librewolf.quaratine.fix.plist"
+    File.write plist_path, <<~EOS
       <?xml version="1.0" encoding="UTF-8"?>
       <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
       <plist version="1.0">
@@ -58,7 +59,11 @@ cask "librewolf" do
       </dict>
       </plist>
     EOS
+    system_command "/bin/launchctl", args: ["load", plist_path]
   end
+
+  uninstall launchctl: "com.user.akdev1l.librewolf.quaratine.fix",
+            delete:    "~/Library/LaunchAgents/com.user.akdev1l.librewolf.quaratine.fix.plist"
 
   zap trash: [
     "~/.librewolf",
@@ -67,7 +72,6 @@ cask "librewolf" do
     "~/Library/Caches/LibreWolf",
     "~/Library/Preferences/io.gitlab.librewolf-community.librewolf.plist",
     "~/Library/Saved Application State/io.gitlab.librewolf-community.librewolf.savedState",
-    "~/Library/LaunchAgents/com.user.akdev1l.librewolf.quaratine.fix.plist",
   ]
 end
 
