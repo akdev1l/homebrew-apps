@@ -27,10 +27,36 @@ cask "librewolf" do
   shimscript = "#{staged_path}/librewolf.wrapper.sh"
   binary shimscript, target: "librewolf"
 
+  launchagent "com.user.akdev1l.librewolf.quaratine.fix.plist"
+
   preflight do
     File.write shimscript, <<~EOS
       #!/bin/sh
       exec '#{appdir}/LibreWolf.app/Contents/MacOS/librewolf' "$@"
+    EOS
+
+    File.write "#{staged_path}/com.user.akdev1l.librewolf.quaratine.fix.plist", <<~EOS
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+        <key>Label</key>
+        <string>com.user.akdev1l.librewolf.quaratine.fix</string>
+        <key>ProgramArguments</key>
+        <array>
+          <string>/usr/bin/xattr</string>
+          <string>-dr</string>
+          <string>com.apple.quarantine</string>
+          <string>#{appdir}/LibreWolf.app</string>
+        </array>
+        <key>WatchPaths</key>
+        <array>
+          <string>#{appdir}/LibreWolf.app</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+      </dict>
+      </plist>
     EOS
   end
 
@@ -41,6 +67,7 @@ cask "librewolf" do
     "~/Library/Caches/LibreWolf",
     "~/Library/Preferences/io.gitlab.librewolf-community.librewolf.plist",
     "~/Library/Saved Application State/io.gitlab.librewolf-community.librewolf.savedState",
+    "~/Library/LaunchAgents/com.user.akdev1l.librewolf.quaratine.fix.plist",
   ]
 end
 
