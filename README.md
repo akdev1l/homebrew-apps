@@ -5,7 +5,7 @@ A custom Homebrew tap with auto-updated cask formulae.
 ## Usage
 
 ```sh
-brew tap akdev1l/homebrew-apps
+brew tap akdev1l/apps
 brew install --cask librewolf
 ```
 
