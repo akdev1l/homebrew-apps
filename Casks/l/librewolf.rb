@@ -1,11 +1,11 @@
 cask "librewolf" do
   arch arm: "arm64", intel: "x86_64"
 
-  version "149.0.2,2"
-  sha256 arm:   "616507b3b915538bb881723c7f83dd37204375ce7557d5140861b0c5b507e1bb",
-         intel: "7a2113d229c5dbee92b78da0d20480ef0ebe340ec3c07ec06b7e5c3a6284c84c"
+  version "150.0.1,1"
+  sha256 arm:   "a184eaa1b529ac09d59185ab925332c79da57f91fab8eecdf592c4021db97973",
+         intel: "5290a0de433190ce0f307b40c841bc58c5f3c991482dfdfff6414b72ea7b6d85"
 
-  url "https://codeberg.org/api/packages/librewolf/generic/librewolf/149.0.2-2/librewolf-149.0.2-2-macos-#{arch}-package.dmg",
+  url "https://codeberg.org/api/packages/librewolf/generic/librewolf/150.0.1-1/librewolf-150.0.1-1-macos-#{arch}-package.dmg",
       verified: "codeberg.org/api/packages/librewolf/generic/librewolf/"
   name "LibreWolf"
   desc "Web browser"
