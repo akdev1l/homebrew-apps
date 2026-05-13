@@ -1,0 +1,32 @@
+name: PR Check - Install LibreWolf
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  install-librewolf:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Tap this repository's PR branch
+        run: |
+          brew tap \
+            ${{ github.repository_owner }}/$(echo "${{ github.repository }}" | sed 's/.*homebrew-//') \
+            https://github.com/${{ github.repository }}.git \
+            ${{ github.event.pull_request.head.ref }}
+
+      - name: Install LibreWolf
+        run: brew install --verbose librewolf
+
+      - name: Verify installation
+        run: librewolf --version
