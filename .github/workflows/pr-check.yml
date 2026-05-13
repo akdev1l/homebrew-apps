@@ -12,6 +12,9 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
+      - name: brew tap
+        run: brew tap akdev1l/apps
+
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
