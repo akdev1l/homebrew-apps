@@ -22,7 +22,7 @@ jobs:
           path: "$(brew --repository/Library/Taps/akdev1l/homebrew-apps"
 
       - name: Install LibreWolf
-        run: brew install --verbose librewolf
+        run: brew install --verbose akdev1l/apps/librewolf
 
       - name: Verify installation
         run: librewolf --version
