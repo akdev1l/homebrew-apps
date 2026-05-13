@@ -3,7 +3,7 @@ name: PR Check - Install LibreWolf
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   install-librewolf:
