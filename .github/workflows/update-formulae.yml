@@ -39,4 +39,11 @@ jobs:
           git checkout -b "$BRANCH"
           git commit -m "chore: update formulae"
           git push -f origin "$BRANCH"
-          gh pr create --title "chore: update formulae" --body "Automated formula update." --base master --head "$BRANCH"
+          
+          if ! gh pr view >/dev/null 2>&1; then
+            gh pr create \
+              --title "chore: update formulate" \
+              --body "Automated update." \
+              --base master \
+              --head "$BRANCH"
+          fi
