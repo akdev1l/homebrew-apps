@@ -31,6 +31,11 @@ cask "qbittorrent" do
     # Renamed for consistency: app name is different in the Finder and in a shell.
     app "qbittorrent.app", target: "qBittorrent.app"
 
+    # Remove quarantine
+    postflight do
+      system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{appdir}/qBittorrent.app"]
+    end
+
     zap trash: [
       "~/.config/qBittorrent",
       "~/Library/Application Support/qBittorrent",
