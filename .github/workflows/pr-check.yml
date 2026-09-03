@@ -20,18 +20,12 @@ jobs:
           - cask: fedora-media-writer
             app: FedoraMediaWriter.app
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
+      # Since this repo is named "homebrew-apps", this action auto-taps
+      # akdev1l/apps from $GITHUB_SHA and symlinks it into $GITHUB_WORKSPACE
+      # itself, so no separate checkout/tap step is needed (or safe to add:
+      # it would collide with the tap this action already creates).
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
-
-      # Tapping from the local checkout (instead of the remote repo) means
-      # the install below exercises the PR's changes, not what's published.
-      - name: Tap local checkout
-        run: brew tap akdev1l/apps "$GITHUB_WORKSPACE"
 
       - name: Install ${{ matrix.cask }}
         run: brew install --cask --verbose "akdev1l/apps/${{ matrix.cask }}"
