@@ -1,0 +1,27 @@
+cask "xmoto" do
+  version "{{release_version}}"
+  sha256 "{{release_sha256sum}}"
+
+  url "https://github.com/xmoto/xmoto/releases/download/v#{version}/xmoto-#{version}-arm64-macos.dmg",
+      verified: "github.com/xmoto/xmoto/"
+  name "X-Moto"
+  desc "Challenging 2D motocross platform game"
+  homepage "https://xmoto.org/"
+
+  livecheck do
+    url :url
+    strategy :github_latest
+  end
+
+  # Upstream only publishes an arm64 build for macOS.
+  depends_on arch: :arm64
+
+  app "X-Moto.app"
+
+  zap trash: [
+    "~/.config/xmoto",
+    "~/.local/share/xmoto",
+    "~/Library/Preferences/net.sourceforge.xmoto.plist",
+    "~/Library/Saved Application State/net.sourceforge.xmoto.savedState",
+  ]
+end
