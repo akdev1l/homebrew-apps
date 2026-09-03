@@ -1,0 +1,59 @@
+---
+- name: "fetch latest release"
+  uri:
+    url: "{{ formula.release_api }}"
+    return_content: true
+  register: release
+
+- name: "set version"
+  set_fact:
+    current_version: "{{ release.json.tag_name | regex_replace('^v', '') }}"
+    current_sha256sum: ""
+
+- name: "select macos dmg asset"
+  set_fact:
+    dmg_asset: "{{ release.json.assets | selectattr('name', 'search', 'arm64-macos\\.dmg$') | list | first | default({}) }}"
+
+- name: "assert a dmg asset was published"
+  assert:
+    that: dmg_asset.browser_download_url is defined
+    fail_msg: "no macOS .dmg asset in {{ release.json.tag_name }}"
+
+- name: "set sha256sum from the asset digest"
+  set_fact:
+    current_sha256sum: "{{ dmg_asset.digest | default('', true) | regex_replace('^sha256:', '') }}"
+
+# xmoto's assets carry no `digest`, so this fallback is the normal path here.
+- name: "hash the dmg when the release omits a digest"
+  when: not current_sha256sum
+  block:
+    - name: "download dmg"
+      get_url:
+        url: "{{ dmg_asset.browser_download_url }}"
+        dest: "/tmp/{{ dmg_asset.name }}"
+        mode: "0644"
+      register: dmg_download
+
+    - name: "checksum dmg"
+      stat:
+        path: "{{ dmg_download.dest }}"
+        checksum_algorithm: sha256
+      register: dmg_stat
+
+    - name: "set sha256sum from the downloaded dmg"
+      set_fact:
+        current_sha256sum: "{{ dmg_stat.stat.checksum }}"
+
+- name: "ensure cask directory exists"
+  file:
+    path: "{{ playbook_dir }}/{{ formula.template_src | regex_replace('\\.j2$', '') | dirname }}"
+    state: directory
+    mode: "0755"
+
+- name: "render template"
+  template:
+    src: "{{ formula.template_src }}"
+    dest: "{{ playbook_dir }}/{{ formula.template_src | regex_replace('\\.j2$', '') }}"
+  vars:
+    release_version: "{{ current_version }}"
+    release_sha256sum: "{{ current_sha256sum }}"

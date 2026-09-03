@@ -1,13 +1,25 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: generate formulae
   hosts: localhost
-  vars:
-    formulae:
-      - release_api: "https://codeberg.org/api/v1/repos/librewolf/bsys6/releases/latest"
-        template_src: "Casks/l/librewolf.rb.j2"
   tasks:
-    - name: process each formula
-      include_tasks: tasks/formula.yml
+    - name: librewolf
+      include_tasks: tasks/codeberg-formula.yml
       vars:
-        formula: "{{item}}"
-      loop: "{{ formulae }}"
+        formula:
+          release_api: "https://codeberg.org/api/v1/repos/librewolf/bsys6/releases/latest"
+          template_src: "Casks/l/librewolf.rb.j2"
+
+    - name: qbittorrent
+      include_tasks: tasks/qbittorrent.yml
+      vars:
+        formula:
+          release_api: "https://api.github.com/repos/qBittorrent/qBittorrent/releases/latest"
+          template_src: "Casks/q/qbittorrent.rb.j2"
+
+    - name: xmoto
+      include_tasks: tasks/xmoto.yml
+      vars:
+        formula:
+          release_api: "https://api.github.com/repos/xmoto/xmoto/releases/latest"
+          template_src: "Casks/x/xmoto.rb.j2"

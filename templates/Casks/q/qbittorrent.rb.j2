@@ -1,0 +1,67 @@
+cask "qbittorrent" do
+  arch intel: "x86_64"
+
+  on_monterey :or_older do
+    version "5.0.5"
+    sha256 "7285e98b5ef4b9a227247dcd933f1a556bfc1ff10901fc7aedb0c4b7ad082814"
+
+    # Upstream only started publishing to GitHub with 5.2.0, so the legacy
+    # build is still only available from SourceForge.
+    url "https://downloads.sourceforge.net/qbittorrent/qbittorrent-mac/qbittorrent-#{version}/qbittorrent-#{version}.dmg"
+
+    livecheck do
+      skip "Legacy version"
+    end
+  end
+  on_ventura :or_newer do
+    version "{{release_version}}"
+    sha256 "{{release_sha256sum}}"
+
+    url "https://github.com/qbittorrent/qBittorrent/releases/download/release-#{version}/qbittorrent-#{version}.dmg",
+        verified: "github.com/qbittorrent/qBittorrent/"
+
+    livecheck do
+      url :url
+      strategy :github_latest
+      regex(/release[._-]v?(\d+(?:\.\d+)+)/i)
+    end
+  end
+
+  on_macos do
+    # Renamed for consistency: app name is different in the Finder and in a shell.
+    app "qbittorrent.app", target: "qBittorrent.app"
+
+    zap trash: [
+      "~/.config/qBittorrent",
+      "~/Library/Application Support/qBittorrent",
+      "~/Library/Caches/qBittorrent",
+      "~/Library/Preferences/org.qbittorrent.qBittorrent.plist",
+      "~/Library/Preferences/qBittorrent",
+      "~/Library/Saved Application State/org.qbittorrent.qBittorrent.savedState",
+    ]
+  end
+
+  on_linux do
+    version "{{release_version}}"
+    sha256 "{{release_appimage_sha256sum}}"
+
+    url "https://github.com/qbittorrent/qBittorrent/releases/download/release-#{version}/qbittorrent-#{version}_#{arch}.AppImage",
+        verified: "github.com/qbittorrent/qBittorrent/"
+
+    livecheck do
+      url :url
+      strategy :github_latest
+      regex(/release[._-]v?(\d+(?:\.\d+)+)/i)
+    end
+
+    depends_on arch: :x86_64
+
+    app_image "qbittorrent-#{version}_#{arch}.AppImage", target: "qBittorrent.AppImage"
+  end
+
+  name "qBittorrent"
+  desc "Peer to peer BitTorrent client"
+  homepage "https://www.qbittorrent.org/"
+
+  conflicts_with cask: "qbittorrent@lt20"
+end
