@@ -6,19 +6,41 @@ on:
       - master
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.result }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine changed casks
+        id: matrix
+        run: |
+          declare -A apps=(
+            [librewolf]=LibreWolf.app
+            [qbittorrent]=qBittorrent.app
+            [xmoto]=X-Moto.app
+            [fedora-media-writer]=FedoraMediaWriter.app
+          )
+          changed_files="$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")"
+          result="[]"
+          for cask in "${!apps[@]}"; do
+            if grep -qE "^(Casks|templates/Casks)/./${cask}\.rb(\.j2)?\$" <<<"$changed_files"; then
+              result="$(jq -c --arg cask "$cask" --arg app "${apps[$cask]}" '. + [{"cask": $cask, "app": $app}]' <<<"$result")"
+            fi
+          done
+          echo "result=$result" >> "$GITHUB_OUTPUT"
+
   install-casks:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.matrix != '[]'
     runs-on: macos-latest
     strategy:
       matrix:
-        include:
-          - cask: librewolf
-            app: LibreWolf.app
-          - cask: qbittorrent
-            app: qBittorrent.app
-          - cask: xmoto
-            app: X-Moto.app
-          - cask: fedora-media-writer
-            app: FedoraMediaWriter.app
+        include: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+      fail-fast: false
     steps:
       # Since this repo is named "homebrew-apps", this action auto-taps
       # akdev1l/apps from $GITHUB_SHA and symlinks it into $GITHUB_WORKSPACE
