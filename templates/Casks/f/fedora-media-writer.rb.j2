@@ -1,0 +1,32 @@
+cask "fedora-media-writer" do
+  arch arm: "-arm64"
+
+  version "{{release_version}}"
+  sha256 arm:   "{{release_arm64_sha256sum}}",
+         intel: "{{release_intel_sha256sum}}"
+
+  url "https://github.com/FedoraQt/MediaWriter/releases/download/#{version}/FedoraMediaWriter-macos#{arch}-#{version}.dmg",
+      verified: "github.com/FedoraQt/MediaWriter/"
+  name "Fedora Media Writer"
+  desc "Tool to write Fedora images to portable media"
+  homepage "https://docs.fedoraproject.org/en-US/quick-docs/creating-and-using-a-live-installation-image/"
+
+  livecheck do
+    url :url
+    strategy :github_latest
+  end
+
+  depends_on :macos
+
+  app "FedoraMediaWriter.app"
+
+  # Remove quarantine
+  postflight do
+    system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{appdir}/FedoraMediaWriter.app"]
+  end
+
+  zap trash: [
+    "~/Library/Caches/fedoraproject.org",
+    "~/Library/Saved Application State/org.fedoraproject.MediaWriter.savedState",
+  ]
+end

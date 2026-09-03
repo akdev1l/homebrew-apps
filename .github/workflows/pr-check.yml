@@ -17,6 +17,8 @@ jobs:
             app: qBittorrent.app
           - cask: xmoto
             app: X-Moto.app
+          - cask: fedora-media-writer
+            app: FedoraMediaWriter.app
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
