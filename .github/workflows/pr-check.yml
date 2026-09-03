@@ -1,4 +1,4 @@
-name: PR Check - Install LibreWolf
+name: PR Check - Install Casks
 
 on:
   pull_request:
@@ -6,23 +6,37 @@ on:
       - master
 
 jobs:
-  install-librewolf:
+  install-casks:
     runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - cask: librewolf
+            app: LibreWolf.app
+          - cask: qbittorrent
+            app: qBittorrent.app
+          - cask: xmoto
+            app: X-Moto.app
     steps:
-      - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-
-      - name: brew tap
-        run: brew tap akdev1l/apps
-
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          path: "$(brew --repository/Library/Taps/akdev1l/homebrew-apps"
 
-      - name: Install LibreWolf
-        run: brew install --verbose akdev1l/apps/librewolf
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      # Tapping from the local checkout (instead of the remote repo) means
+      # the install below exercises the PR's changes, not what's published.
+      - name: Tap local checkout
+        run: brew tap akdev1l/apps "$GITHUB_WORKSPACE"
+
+      - name: Install ${{ matrix.cask }}
+        run: brew install --cask --verbose "akdev1l/apps/${{ matrix.cask }}"
 
       - name: Verify installation
+        run: test -d "/Applications/${{ matrix.app }}"
+
+      - name: Verify CLI
+        if: matrix.cask == 'librewolf'
         run: librewolf --version
