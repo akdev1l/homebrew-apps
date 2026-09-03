@@ -40,9 +40,9 @@ jobs:
           git commit -m "chore: update formulae"
           git push -f origin "$BRANCH"
           
-          if ! gh pr view >/dev/null 2>&1; then
+          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number')" ]; then
             gh pr create \
-              --title "chore: update formulate" \
+              --title "chore: update formulae" \
               --body "Automated update." \
               --base master \
               --head "$BRANCH"
