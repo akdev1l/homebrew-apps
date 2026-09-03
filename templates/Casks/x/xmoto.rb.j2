@@ -18,6 +18,11 @@ cask "xmoto" do
 
   app "X-Moto.app"
 
+  # Remove quarantine
+  postflight do
+    system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{appdir}/X-Moto.app"]
+  end
+
   zap trash: [
     "~/.config/xmoto",
     "~/.local/share/xmoto",
