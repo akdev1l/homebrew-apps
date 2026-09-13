@@ -25,7 +25,7 @@ jobs:
       # itself, so no separate checkout/tap step is needed (or safe to add:
       # it would collide with the tap this action already creates).
       - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@2026.09.13.1
 
       - name: Install ${{ matrix.cask }}
         run: brew install --cask --verbose "akdev1l/apps/${{ matrix.cask }}"
